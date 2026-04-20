@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1",
+    "title": "AWS Certified Machine Learning - Specialty",
+    "issuer": "Amazon Web Services",
+    "date": "2024-01",
+    "credentialUrl": "https://aws.amazon.com/verification",
+    "credentialId": "AWS-ML-12345"
+  },
+  {
+    "id": "2",
+    "title": "Deep Learning Specialization",
+    "issuer": "Coursera - deeplearning.ai",
+    "date": "2023-06",
+    "credentialUrl": "https://coursera.org/verify",
+    "credentialId": "DL-12345"
+  }
+]

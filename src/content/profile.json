@@ -1,0 +1,17 @@
+{
+  "name": "Your Name",
+  "title": "Machine Learning Engineer",
+  "tagline": "Building intelligent systems that ship to production",
+  "bio": "Passionate about building intelligent systems that solve real-world problems. Specializing in deep learning, NLP, and computer vision with a focus on shipping production-ready ML solutions.",
+  "location": "Your City, Country",
+  "email": "you@email.com",
+  "github": "https://github.com/yourusername",
+  "linkedin": "https://linkedin.com/in/yourusername",
+  "twitter": "https://twitter.com/yourusername",
+  "skills": {
+    "ml": ["PyTorch", "TensorFlow", "scikit-learn", "Hugging Face", "LangChain", "MLflow", "Weights & Biases"],
+    "mlops": ["Docker", "Kubernetes", "Airflow", "FastAPI", "AWS SageMaker", "GCP Vertex AI", "CI/CD"],
+    "languages": ["Python", "TypeScript", "SQL", "Bash"],
+    "data": ["Pandas", "NumPy", "Spark", "dbt", "BigQuery"]
+  }
+}
