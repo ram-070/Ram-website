@@ -1,17 +1,19 @@
 {
-  "name": "Your Name",
+  "name": "Ram",
   "title": "Machine Learning Engineer",
-  "tagline": "Building intelligent systems that ship to production",
-  "bio": "Passionate about building intelligent systems that solve real-world problems. Specializing in deep learning, NLP, and computer vision with a focus on shipping production-ready ML solutions.",
-  "location": "Your City, Country",
-  "email": "you@email.com",
-  "github": "https://github.com/yourusername",
-  "linkedin": "https://linkedin.com/in/yourusername",
-  "twitter": "https://twitter.com/yourusername",
+  "tagline": "Building intelligent AI systems that ship to production",
+  "bio": "Passionate about building intelligent AI systems that solve real-world problems. Specializing in deep learning, NLP, computer vision, and RAG systems with a focus on production-ready ML solutions. I create AI agents and multimodal systems that push the boundaries of what's possible.",
+  "location": "India",
+  "email": "rammey115@gmail.com",
+  "github": "https://github.com/ram-070/",
+  "linkedin": "https://www.linkedin.com/in/ram-dular-yadav-1611b0228/",
+  "facebook": "https://www.facebook.com/ramdular077",
   "skills": {
-    "ml": ["PyTorch", "TensorFlow", "scikit-learn", "Hugging Face", "LangChain", "MLflow", "Weights & Biases"],
-    "mlops": ["Docker", "Kubernetes", "Airflow", "FastAPI", "AWS SageMaker", "GCP Vertex AI", "CI/CD"],
-    "languages": ["Python", "TypeScript", "SQL", "Bash"],
-    "data": ["Pandas", "NumPy", "Spark", "dbt", "BigQuery"]
+    "machine_learning": ["Machine Learning", "Deep Learning", "Neural Networks", "Transfer Learning"],
+    "nlp": ["NLP", "LLMs", "RAG Systems", "Transformers", "BERT", "GPT"],
+    "computer_vision": ["Computer Vision", "Image Classification", "Object Detection", "Face Recognition"],
+    "frameworks": ["TensorFlow", "PyTorch", "Keras", "Scikit-learn", "Hugging Face"],
+    "tools": ["Python", "SQL", "Jupyter", "Git", "Docker", "FastAPI"],
+    "specialization": ["AI Proctoring", "Interview Agents", "News Detection", "Caption Generation"]
   }
 }

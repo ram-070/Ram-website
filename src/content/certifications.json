@@ -1,18 +1,20 @@
 [
   {
     "id": "1",
-    "title": "AWS Certified Machine Learning - Specialty",
-    "issuer": "Amazon Web Services",
+    "title": "Google Cloud Certified Professional Machine Learning Engineer",
+    "issuer": "Google Cloud",
     "date": "2024-01",
-    "credentialUrl": "https://aws.amazon.com/verification",
-    "credentialId": "AWS-ML-12345"
+    "credentialUrl": "https://drive.google.com/file/d/1TRZJzL6A3WS_ajHZFnt-RvVv050JAU6b/view",
+    "downloadUrl": "https://drive.google.com/file/d/1TRZJzL6A3WS_ajHZFnt-RvVv050JAU6b/download",
+    "credentialId": "GCP-ML-PROF"
   },
   {
     "id": "2",
-    "title": "Deep Learning Specialization",
-    "issuer": "Coursera - deeplearning.ai",
-    "date": "2023-06",
-    "credentialUrl": "https://coursera.org/verify",
-    "credentialId": "DL-12345"
+    "title": "Microdegree in Artificial Intelligence",
+    "issuer": "Fusemachines AI Fellowship",
+    "date": "2023-12",
+    "credentialUrl": "https://drive.google.com/file/d/1U1XAsaa8Ntjb2F0c3a0GbZfgZi8b73oU/view",
+    "downloadUrl": "https://drive.google.com/file/d/1U1XAsaa8Ntjb2F0c3a0GbZfgZi8b73oU/download",
+    "credentialId": "FUSEMACHINES-AI"
   }
 ]
