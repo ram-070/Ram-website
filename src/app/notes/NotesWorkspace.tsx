@@ -546,11 +546,11 @@ function SettingsMenu({
   );
 }
 
-export default function NotesWorkspace() {
+export default function NotesWorkspace({ initialNoteId, initialMode }: { initialNoteId?: string; initialMode?: string }) {
   const [notes, setNotes] = useState<Note[]>(() => createSeedNotes());
   const [folders, setFolders] = useState<FolderItem[]>(() => createSeedFolders());
   const [prefs, setPrefs] = useState<Prefs>({ theme: 'light', workspaceName: 'My Notes' });
-  const [selectedId, setSelectedId] = useState<string | null>(() => createSeedNotes()[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState<string | null>(() => initialNoteId ?? createSeedNotes()[0]?.id ?? null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<NoteFilter>('all');
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
@@ -630,7 +630,7 @@ export default function NotesWorkspace() {
   useEffect(() => {
     if (!editor || !currentNote) return;
     if (editor.getHTML() !== currentNote.contentHtml) {
-      editor.commands.setContent(currentNote.contentHtml || EMPTY_HTML, false);
+      editor.commands.setContent(currentNote.contentHtml || EMPTY_HTML, { emitUpdate: false });
     }
   }, [currentNote, editor]);
 
@@ -642,7 +642,12 @@ export default function NotesWorkspace() {
         if (parsed.notes.length) {
           setNotes(parsed.notes);
           setFolders(parsed.folders);
-          setSelectedId((current) => (current && parsed.notes.some((note) => note.id === current) ? current : parsed.notes[0].id));
+          // Prefer explicit initialNoteId if provided and present in parsed notes
+          if (initialNoteId && parsed.notes.some((note: Note) => note.id === initialNoteId)) {
+            setSelectedId(initialNoteId);
+          } else {
+            setSelectedId((current) => (current && parsed.notes.some((note) => note.id === current) ? current : parsed.notes[0].id));
+          }
         }
       }
 
@@ -704,6 +709,13 @@ export default function NotesWorkspace() {
     setFilter('all');
     setSidebarOpen(false);
   }, []);
+
+  // If page requested a new note immediately, create one on mount
+  useEffect(() => {
+    if (initialMode === 'new') {
+      createNote();
+    }
+  }, [initialMode, createNote]);
 
   const duplicateNote = useCallback((note: Note) => {
     const copy: Note = {

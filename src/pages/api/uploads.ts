@@ -23,8 +23,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const entries = Array.isArray(files.file) ? files.file : files.file ? [files.file] : [];
     for (const f of entries) {
       if (!f) continue;
-      const fname = path.basename(f.filepath || f.path || 'file');
-      fileArray.push({ url: `/uploads/${fname}`, filename: f.originalFilename || fname, mime: f.mimetype || f.type || 'application/octet-stream' });
+      const fp = (f as any).filepath || (f as any).path || 'file';
+      const fname = path.basename(fp);
+      fileArray.push({ url: `/uploads/${fname}`, filename: (f as any).originalFilename || fname, mime: (f as any).mimetype || (f as any).type || 'application/octet-stream' });
     }
     res.status(200).json({ files: fileArray });
   });
