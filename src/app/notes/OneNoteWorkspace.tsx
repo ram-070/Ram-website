@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
 import Highlight from '@tiptap/extension-highlight';
 import Placeholder from '@tiptap/extension-placeholder';
 import TaskList from '@tiptap/extension-task-list';
@@ -141,6 +140,9 @@ export default function OneNoteWorkspace() {
       } else {
         setExpandedNotebooks(new Set([data[0].id]));
         setExpandedSections(new Set(data[0].sections[0] ? [data[0].sections[0].id] : []));
+
+        const firstPage = data.flatMap((nb) => nb.sections).flatMap((s) => s.pages)[0];
+        if (firstPage) setSelectedPageId(firstPage.id);
       }
       setLoading(false);
     })();
@@ -157,7 +159,6 @@ export default function OneNoteWorkspace() {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
-      Underline,
       Highlight.configure({ multicolor: false }),
       TaskList,
       TaskItem.configure({ nested: true }),
