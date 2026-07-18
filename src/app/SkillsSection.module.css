@@ -25,7 +25,7 @@
   height: 20rem;
   left: -6rem;
   top: 2rem;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.24), transparent 70%);
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.24), transparent 70%);
   transform: translate3d(calc(var(--mx) * 18px), calc(var(--my) * 12px), 0);
 }
 
@@ -34,7 +34,7 @@
   height: 18rem;
   right: -4rem;
   top: 7rem;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.2), transparent 68%);
+  background: radial-gradient(circle, rgba(15, 118, 110, 0.2), transparent 68%);
   transform: translate3d(calc(var(--mx) * -14px), calc(var(--my) * 16px), 0);
 }
 
