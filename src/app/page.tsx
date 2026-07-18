@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
+import * as Dialog from '@radix-ui/react-dialog';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import styles from './SkillsSection.module.css';
@@ -23,7 +25,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Award,
+  Network,
 } from 'lucide-react';
+
+const PDFViewer = dynamic(() => import('../components/PDFViewer'), { ssr: false });
 
 // ─────────────────────────────────────────────────────────────
 //  DATA
@@ -88,6 +93,16 @@ const projects = [
     image: '/imag-gen.png',
 
     demo: null as string | null,
+  },
+  {
+    id: 6,
+    title: 'GNN-Based Bonus Abuse Detection',
+    description:
+      'Graph Neural Network system for detecting bonus/promo abuse rings by modeling players, devices, IP addresses, affiliates, and bonuses as a heterogeneous graph — surfacing shared-device and shared-IP links between accounts that traditional rule-based checks miss.',
+    github: null as string | null,
+    image: null as string | null,
+    demo: null as string | null,
+    graph: true,
   },
 ];
 
@@ -193,7 +208,7 @@ const experiences = [
       'Deep-dived into Transformers, Generative AI, and MLOps best practices',
     ],
     tags: ['Deep Learning', 'NLP', 'Computer Vision', 'Docker', 'MLOps'],
-    color: '#7c3aed',
+    color: '#e11d48',
   },
   {
     id: 4,
@@ -266,11 +281,12 @@ const SectionHeader = ({
 //  NAVIGATION
 // ─────────────────────────────────────────────────────────────
 
-const NAV_SECTIONS = ['Home', 'About', 'Projects', 'Skills', 'Experience', 'Certifications', 'Contact'];
+const NAV_SECTIONS = ['Home', 'About', 'Projects', 'Publications', 'Skills', 'Experience', 'Certifications', 'Contact'];
 const SECTION_IDS: Record<string, string> = {
   Home: 'home',
   About: 'about',
   Projects: 'projects',
+  Publications: 'publications',
   Skills: 'skills',
   Experience: 'experience',
   Certifications: 'certifications',
@@ -283,12 +299,14 @@ const NavBar = ({
   scrollToSection,
   theme,
   onToggleTheme,
+  onOpenResume,
 }: {
   activeSection: string;
   scrollProgress: number;
   scrollToSection: (s: string) => void;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
+  onOpenResume: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -348,24 +366,17 @@ const NavBar = ({
             >
               Notes
             </motion.a>
-            <motion.a
-              href="/blog"
-              whileHover={{ scale: 1.05 }}
-              className="text-sm font-medium text-slate-400 hover:text-slate-800 transition-colors"
-            >
-              Blog
-            </motion.a>
-            <motion.a
-              href="/Ram-CV.pdf"
-              download
+            <motion.button
+              type="button"
+              onClick={onOpenResume}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-sm font-semibold"
               style={{ background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)' }}
             >
-              <Download size={13} />
+              <FileText size={13} />
               Resume
-            </motion.a>
+            </motion.button>
             <motion.button
               type="button"
               whileHover={{ scale: 1.05 }}
@@ -426,7 +437,6 @@ const NavBar = ({
                   </button>
                 ))}
                 <a href="/notes" className="text-sm font-medium text-slate-500 hover:text-slate-900">Notes</a>
-                <a href="/blog" className="text-sm font-medium text-slate-500 hover:text-slate-900">Blog</a>
                 <button
                   type="button"
                   onClick={onToggleTheme}
@@ -436,14 +446,17 @@ const NavBar = ({
                   {theme === 'light' ? <Moon size={14} /> : <SunMedium size={14} />}
                   {theme === 'light' ? 'Dark mode' : 'Light mode'}
                 </button>
-                <a
-                  href="/Ram-CV.pdf"
-                  download
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenResume();
+                    setIsOpen(false);
+                  }}
                   className="w-fit flex items-center gap-2 px-4 py-2.5 rounded-lg text-white text-sm font-semibold"
                   style={{ background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)' }}
                 >
-                  <Download size={13} /> Resume
-                </a>
+                  <FileText size={13} /> Resume
+                </button>
               </div>
             </motion.div>
           )}
@@ -466,7 +479,7 @@ const NavBar = ({
 //  HERO
 // ─────────────────────────────────────────────────────────────
 
-const HeroSection = () => (
+const HeroSection = ({ onOpenResume }: { onOpenResume: () => void }) => (
   <section
     id="home"
     className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden"
@@ -503,9 +516,9 @@ const HeroSection = () => (
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs mb-8"
           style={{
             fontFamily: 'var(--font-mono)',
-            borderColor: 'rgba(99,102,241,0.18)',
+            borderColor: 'rgba(79,70,229,0.18)',
             color: 'var(--accent)',
-            background: 'rgba(99,102,241,0.04)',
+            background: 'rgba(79,70,229,0.04)',
           }}
         >
           <span className="status-dot" />
@@ -527,7 +540,7 @@ const HeroSection = () => (
           <span style={{ color: 'var(--text-3)' }}>Hi, I&apos;m </span>
           <span
             style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
+              background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -580,23 +593,23 @@ const HeroSection = () => (
             whileHover={{
               scale: 1.04,
               boxShadow: '0 0 30px rgba(79,70,229,0.28)',
-              background: 'linear-gradient(135deg, #4338ca 0%, #0369a1 100%)',
+              background: 'linear-gradient(135deg, #4338ca 0%, #115e59 100%)',
             }}
             whileTap={{ scale: 0.97 }}
             className="px-8 py-3.5 rounded-xl font-semibold text-white text-sm"
             style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
-              boxShadow: '0 12px 28px rgba(99,102,241,0.22)',
+              background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)',
+              boxShadow: '0 12px 28px rgba(79,70,229,0.22)',
             }}
           >
             View Projects
           </motion.a>
-          <motion.a
-            href="/Ram-CV.pdf"
-            download
+          <motion.button
+            type="button"
+            onClick={onOpenResume}
             whileHover={{
               scale: 1.04,
-              background: 'linear-gradient(135deg, #4338ca 0%, #0369a1 100%)',
+              background: 'linear-gradient(135deg, #4338ca 0%, #115e59 100%)',
               color: '#ffffff',
               borderColor: 'transparent',
               boxShadow: '0 0 24px rgba(79,70,229,0.2)',
@@ -604,15 +617,15 @@ const HeroSection = () => (
             whileTap={{ scale: 0.97 }}
             className="px-8 py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border transition-all"
             style={{
-              borderColor: 'rgba(99,102,241,0.22)',
-              color: '#3730a3',
+              borderColor: 'rgba(79,70,229,0.22)',
+              color: 'var(--accent)',
               background: '#ffffff',
               boxShadow: '0 10px 24px rgba(15,23,42,0.06)',
             }}
           >
-            <Download size={15} />
-            Download CV
-          </motion.a>
+            <FileText size={15} />
+            View Resume
+          </motion.button>
         </motion.div>
 
         {/* Social links */}
@@ -659,7 +672,7 @@ const HeroSection = () => (
           {/* Photo frame */}
           <div
             className="relative w-full h-full rounded-2xl overflow-hidden border"
-            style={{ borderColor: 'rgba(99,102,241,0.14)', background: '#f8fafc' }}
+            style={{ borderColor: 'rgba(79,70,229,0.14)', background: '#f8fafc' }}
           >
             <Image
               src="/photos.png"
@@ -703,7 +716,7 @@ const HeroSection = () => (
 //  ABOUT
 // ─────────────────────────────────────────────────────────────
 
-const AboutSection = () => {
+const AboutSection = ({ onOpenResume }: { onOpenResume: () => void }) => {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.08 });
 
   const stats = [
@@ -724,13 +737,27 @@ const AboutSection = () => {
         <SectionHeader inView={inView} label="WHO AM I" title="About Me" />
 
         <div className="grid lg:grid-cols-2 gap-16 items-center mt-16">
-          {/* Bio text */}
+          {/* Photo + bio text */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ delay: 0.2, duration: 0.55 }}
-            className="space-y-5 text-center lg:text-left"
+            className="grid sm:grid-cols-[minmax(0,200px)_1fr] gap-8 items-start"
           >
+            <div className="relative w-40 h-40 sm:w-full sm:h-auto sm:aspect-square mx-auto sm:mx-0">
+              <div
+                className="absolute inset-0 rounded-2xl blur-2xl opacity-25"
+                style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-2))' }}
+              />
+              <div
+                className="relative w-full h-full rounded-2xl overflow-hidden border"
+                style={{ borderColor: 'rgba(79,70,229,0.14)', background: '#f8fafc' }}
+              >
+                <Image src="/about-photo.jpg" alt="Ram Dular Yadav" fill className="object-cover" sizes="200px" />
+              </div>
+            </div>
+
+            <div className="space-y-5 text-center sm:text-left">
             <p className="text-slate-500 leading-relaxed">
               I&apos;m a Machine Learning Engineer based in Kathmandu, Nepal. My journey into AI
               started with a deep fascination for how machines can understand language and visual
@@ -751,25 +778,26 @@ const AboutSection = () => {
               in clean code, reproducible experiments, and AI that genuinely ships to users.
             </p>
             <div className="pt-2">
-              <motion.a
-                href="/Ram-CV.pdf"
-                download
+              <motion.button
+                type="button"
+                onClick={onOpenResume}
                 whileHover={{
                   scale: 1.04,
-                  background: 'linear-gradient(135deg, #4338ca 0%, #0369a1 100%)',
+                  background: 'linear-gradient(135deg, #4338ca 0%, #115e59 100%)',
                   color: '#ffffff',
                   boxShadow: '0 0 24px rgba(79,70,229,0.2)',
                 }}
                 whileTap={{ scale: 0.97 }}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold text-sm"
                 style={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
-                  boxShadow: '0 10px 24px rgba(99,102,241,0.22)',
+                  background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)',
+                  boxShadow: '0 10px 24px rgba(79,70,229,0.22)',
                 }}
               >
                 <FileText size={15} />
-                Download Full Resume
-              </motion.a>
+                View Full Resume
+              </motion.button>
+            </div>
             </div>
           </motion.div>
 
@@ -783,7 +811,7 @@ const AboutSection = () => {
             {stats.map((s, i) => (
               <motion.div
                 key={i}
-                whileHover={{ y: -5, borderColor: 'rgba(124,58,237,0.22)' }}
+                whileHover={{ y: -5, borderColor: 'rgba(79, 70, 229,0.22)' }}
                 className="p-6 rounded-2xl border transition-all duration-200"
                 style={premiumGlassCard}
               >
@@ -813,8 +841,62 @@ const AboutSection = () => {
 //  PROJECTS
 // ─────────────────────────────────────────────────────────────
 
+const GNN_NODES = [
+  { id: 'player1', label: 'Player A', type: 'player', x: 70, y: 70 },
+  { id: 'player2', label: 'Player B', type: 'player', x: 70, y: 270 },
+  { id: 'player3', label: 'Player C', type: 'player', x: 70, y: 170 },
+  { id: 'device', label: 'Device', type: 'device', x: 250, y: 220 },
+  { id: 'ip', label: 'IP Address', type: 'ip', x: 250, y: 70 },
+  { id: 'affiliate', label: 'Affiliate', type: 'affiliate', x: 430, y: 70 },
+  { id: 'bonus', label: 'Bonus', type: 'bonus', x: 430, y: 220 },
+];
+
+const GNN_EDGES = [
+  ['player1', 'device'],
+  ['player2', 'device'],
+  ['player1', 'ip'],
+  ['player3', 'ip'],
+  ['player1', 'affiliate'],
+  ['player2', 'bonus'],
+  ['player3', 'bonus'],
+];
+
+const GNN_NODE_COLORS: Record<string, string> = {
+  player: 'var(--accent)',
+  device: 'var(--accent-2)',
+  ip: 'var(--accent-warm)',
+  affiliate: 'var(--accent-purple)',
+  bonus: '#db2777',
+};
+
+const GNNGraph = () => (
+  <div>
+    <svg viewBox="0 0 500 300" className="w-full h-auto" role="img" aria-label="Heterogeneous graph linking Player, Device, IP Address, Affiliate, and Bonus nodes">
+      {GNN_EDGES.map(([from, to]) => {
+        const a = GNN_NODES.find((n) => n.id === from)!;
+        const b = GNN_NODES.find((n) => n.id === to)!;
+        return <line key={`${from}-${to}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="var(--border-strong)" strokeWidth={1.5} />;
+      })}
+      {GNN_NODES.map((node) => (
+        <g key={node.id}>
+          <circle cx={node.x} cy={node.y} r={node.type === 'player' ? 22 : 18} fill={GNN_NODE_COLORS[node.type]} opacity={0.16} />
+          <circle cx={node.x} cy={node.y} r={node.type === 'player' ? 9 : 7} fill={GNN_NODE_COLORS[node.type]} />
+          <text x={node.x} y={node.y + (node.type === 'player' ? 38 : 34)} textAnchor="middle" fontSize="11" fill="var(--text-secondary)" fontFamily="var(--font-body)">
+            {node.label}
+          </text>
+        </g>
+      ))}
+    </svg>
+    <p className="text-xs text-slate-400 mt-2 italic">
+      Illustrative graph: Players A &amp; B share a Device, Players A &amp; C share an IP Address — the kind of hidden link a
+      heterogeneous GNN learns to flag as a likely bonus-abuse ring.
+    </p>
+  </div>
+);
+
 const ProjectsSection = () => {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.04 });
+  const [graphOpenId, setGraphOpenId] = useState<number | null>(null);
 
   return (
     <section
@@ -837,9 +919,9 @@ const ProjectsSection = () => {
               className="group relative overflow-hidden p-6 rounded-2xl border flex flex-col transition-all duration-300 w-full max-w-[23rem]"
               style={{ ...premiumGlassCard }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(124,58,237,0.2)';
+                (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(79, 70, 229,0.2)';
                 (e.currentTarget as HTMLDivElement).style.boxShadow =
-                  '0 22px 48px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(124,58,237,0.08), inset 0 1px 0 rgba(255, 255, 255, 0.86)';
+                  '0 22px 48px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(79, 70, 229,0.08), inset 0 1px 0 rgba(255, 255, 255, 0.86)';
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(226, 232, 240, 0.85)';
@@ -874,34 +956,69 @@ const ProjectsSection = () => {
               </h3>
               <p className="text-slate-500 text-sm mb-5 leading-relaxed flex-1">{p.description}</p>
 
+              {p.graph && (
+                <AnimatePresence>
+                  {graphOpenId === p.id && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="overflow-hidden mb-4"
+                    >
+                      <div className="rounded-xl border p-3" style={{ borderColor: 'rgba(226,232,240,0.85)', background: 'var(--bg-elevated)' }}>
+                        <GNNGraph />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              )}
+
               {/* Actions */}
               <div className="flex gap-3">
-                <motion.a
-                  href={p.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
-                  aria-label={`Open ${p.title} GitHub repository`}
-                  title="Open GitHub repository"
-                  className="flex-1 flex items-center justify-center py-2.5 rounded-xl text-sm font-medium border transition-all"
-                  style={{ borderColor: 'rgba(226, 232, 240, 0.85)', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.72)' }}
-                >
-                  <GithubIcon className="w-5 h-5" />
-                  <span className="sr-only">Code on GitHub</span>
-                </motion.a>
-                {p.demo && (
-                  <motion.a
-                    href={p.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.96 }}
+                {p.graph ? (
+                  <motion.button
+                    type="button"
+                    onClick={() => setGraphOpenId((current) => (current === p.id ? null : p.id))}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border transition-all"
-                    style={{ borderColor: 'rgba(124,58,237,0.22)', color: 'var(--accent)', background: 'rgba(124,58,237,0.06)' }}
+                    style={{ borderColor: 'rgba(79, 70, 229,0.22)', color: 'var(--accent)', background: 'rgba(79, 70, 229,0.06)' }}
                   >
-                    <ExternalLink size={14} /> Watch Video
-                  </motion.a>
+                    <Network size={14} /> {graphOpenId === p.id ? 'Hide Graph' : 'View Node Graph'}
+                  </motion.button>
+                ) : (
+                  <>
+                    {p.github && (
+                      <motion.a
+                        href={p.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                        aria-label={`Open ${p.title} GitHub repository`}
+                        title="Open GitHub repository"
+                        className="flex-1 flex items-center justify-center py-2.5 rounded-xl text-sm font-medium border transition-all"
+                        style={{ borderColor: 'rgba(226, 232, 240, 0.85)', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.72)' }}
+                      >
+                        <GithubIcon className="w-5 h-5" />
+                        <span className="sr-only">Code on GitHub</span>
+                      </motion.a>
+                    )}
+                    {p.demo && (
+                      <motion.a
+                        href={p.demo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium border transition-all"
+                        style={{ borderColor: 'rgba(79, 70, 229,0.22)', color: 'var(--accent)', background: 'rgba(79, 70, 229,0.06)' }}
+                      >
+                        <ExternalLink size={14} /> Watch Video
+                      </motion.a>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -931,6 +1048,108 @@ const ProjectsSection = () => {
 };
 
 // ─────────────────────────────────────────────────────────────
+//  PUBLICATIONS
+// ─────────────────────────────────────────────────────────────
+
+const PUBLICATION = {
+  title: 'AI-based Online Exam Proctoring System',
+  authors: 'Ramdular Yadav, Khushilal Mahato, Sunny Ravidas, Sushant Lal Karn, Dharti Raj Shah, Pukar Karki',
+  affiliation: 'Department of Electronics and Computer Engineering, Purwanchal Campus, IOE, Tribhuvan University, Nepal',
+  venue: 'Proceedings of IOE Graduate Conference · Volume 16 · April 2026',
+  abstract:
+    'An AI-based online examination proctoring system built to tackle the challenges of maintaining integrity in remote exams. It combines YOLOv8 for object detection, MediaPipe for gaze tracking, and PyAudio-based audio analysis to flag unauthorized tab switching, restricted objects, and multiple faces in frame. Built on Django with PostgreSQL, the system logs and reports suspicious activity in real time for administrators, aiming to make remote assessment as trustworthy as in-person invigilation.',
+  keywords: ['AI-Based Proctoring', 'Object Detection', 'YOLOv8', 'Gaze Tracking', 'MediaPipe', 'Audio Analysis', 'Remote Examination'],
+  pdf: '/publications/ai-proctoring-research-paper.pdf',
+};
+
+const PublicationsSection = () => {
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.08 });
+  const [open, setOpen] = useState(false);
+
+  return (
+    <section id="publications" ref={ref} className="py-28 px-6" style={premiumSectionBackground}>
+      <div className={sectionWidthClass}>
+        <SectionHeader inView={inView} label="RESEARCH" title="Publications" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.15, duration: 0.5 }}
+          className="mt-14 p-8 rounded-2xl border"
+          style={premiumGlassCard}
+        >
+          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+            <div>
+              <h3 className="text-slate-900 font-bold text-xl mb-2">{PUBLICATION.title}</h3>
+              <p className="text-sm text-slate-500 mb-1">{PUBLICATION.authors}</p>
+              <p className="text-xs text-slate-400 mb-3">{PUBLICATION.affiliation}</p>
+              <p className="text-xs font-mono" style={{ color: 'var(--accent)' }}>
+                {PUBLICATION.venue}
+              </p>
+            </div>
+            <div className="flex gap-3 shrink-0">
+              <motion.button
+                type="button"
+                onClick={() => setOpen((value) => !value)}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="px-5 py-2.5 rounded-xl font-semibold text-white text-sm flex items-center gap-2"
+                style={{ background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)' }}
+              >
+                <FileText size={15} />
+                {open ? 'Hide Paper' : 'View Paper'}
+              </motion.button>
+              <a
+                href={PUBLICATION.pdf}
+                download
+                className="px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 border"
+                style={{ borderColor: 'rgba(226, 232, 240, 0.85)', color: 'var(--text-secondary)' }}
+              >
+                <Download size={15} />
+                Download
+              </a>
+            </div>
+          </div>
+
+          <p className="text-slate-500 leading-relaxed mt-6">{PUBLICATION.abstract}</p>
+
+          <div className="flex flex-wrap gap-2 mt-5">
+            {PUBLICATION.keywords.map((keyword) => (
+              <span key={keyword} className="tag">
+                {keyword}
+              </span>
+            ))}
+          </div>
+
+          <p className="text-xs text-slate-400 mt-5 italic">
+            This paper documents the research behind the &ldquo;AI-Based Online Exam Proctoring System&rdquo; project above.
+          </p>
+
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden mt-6"
+              >
+                <div
+                  className="rounded-xl border overflow-hidden"
+                  style={{ borderColor: 'rgba(226,232,240,0.85)', height: 640 }}
+                >
+                  <PDFViewer url={PUBLICATION.pdf} name="AI-based Online Exam Proctoring System.pdf" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
 //  SKILLS
 // ─────────────────────────────────────────────────────────────
 
@@ -944,12 +1163,12 @@ const SkillsSection = () => {
   } as React.CSSProperties;
 
   const skillPalettes = [
-    { accent: '#7c3aed', soft: 'rgba(124, 58, 237, 0.18)', glow: 'rgba(124, 58, 237, 0.32)' },
-    { accent: '#0ea5e9', soft: 'rgba(14, 165, 233, 0.16)', glow: 'rgba(14, 165, 233, 0.30)' },
-    { accent: '#14b8a6', soft: 'rgba(20, 184, 166, 0.16)', glow: 'rgba(20, 184, 166, 0.30)' },
+    { accent: '#0891b2', soft: 'rgba(8, 145, 178, 0.18)', glow: 'rgba(8, 145, 178, 0.32)' },
+    { accent: '#e11d48', soft: 'rgba(225, 29, 72, 0.16)', glow: 'rgba(225, 29, 72, 0.30)' },
+    { accent: '#16a34a', soft: 'rgba(22, 163, 74, 0.16)', glow: 'rgba(22, 163, 74, 0.30)' },
     { accent: '#f59e0b', soft: 'rgba(245, 158, 11, 0.16)', glow: 'rgba(245, 158, 11, 0.30)' },
     { accent: '#ec4899', soft: 'rgba(236, 72, 153, 0.16)', glow: 'rgba(236, 72, 153, 0.28)' },
-    { accent: '#8b5cf6', soft: 'rgba(139, 92, 246, 0.16)', glow: 'rgba(139, 92, 246, 0.28)' },
+    { accent: '#c026d3', soft: 'rgba(192, 38, 211, 0.16)', glow: 'rgba(192, 38, 211, 0.28)' },
   ];
 
   return (
@@ -1032,7 +1251,7 @@ const SkillsSection = () => {
 
 const premiumSectionBackground = {
   background:
-    'radial-gradient(circle at top, rgba(124, 58, 237, 0.08), transparent 36%), radial-gradient(circle at 85% 20%, rgba(14, 165, 233, 0.06), transparent 30%), linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)',
+    'radial-gradient(circle at top, rgba(79, 70, 229, 0.08), transparent 36%), radial-gradient(circle at 85% 20%, rgba(15, 118, 110, 0.06), transparent 30%), linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)',
 } as React.CSSProperties;
 
 const premiumGlassCard = {
@@ -1073,7 +1292,7 @@ const ExperienceSection = () => {
             className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 z-0"
             style={{
               background:
-                'linear-gradient(180deg, rgba(11,110,246,0.3) 0%, rgba(0,191,166,0.18) 50%, rgba(124,58,237,0.12) 80%, transparent 100%)',
+                'linear-gradient(180deg, rgba(79,70,229,0.3) 0%, rgba(15,118,110,0.18) 50%, rgba(79, 70, 229,0.12) 80%, transparent 100%)',
             }}
           />
 
@@ -1725,24 +1944,50 @@ const BackToTop = () => {
 };
 
 // ─────────────────────────────────────────────────────────────
+//  RESUME VIEWER
+// ─────────────────────────────────────────────────────────────
+
+const ResumeViewerModal = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => (
+  <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Portal>
+      <Dialog.Overlay className="fixed inset-0 bg-slate-900/45 z-[100]" />
+      <Dialog.Content
+        className="fixed z-[101] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(48rem,92vw)] h-[min(42rem,88vh)] rounded-2xl overflow-hidden border shadow-2xl flex flex-col bg-white"
+        style={{ borderColor: 'rgba(226,232,240,0.85)' }}
+      >
+        <div className="flex items-center justify-between px-4 py-2.5 border-b" style={{ borderColor: 'rgba(226,232,240,0.85)' }}>
+          <Dialog.Title className="text-sm font-semibold text-slate-700">Resume</Dialog.Title>
+          <Dialog.Close asChild>
+            <button type="button" className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100" aria-label="Close">
+              <X size={16} />
+            </button>
+          </Dialog.Close>
+        </div>
+        <div className="flex-1 min-h-0">
+          <PDFViewer url="/Ram-CV.pdf" name="Ram Dular Yadav - Resume.pdf" />
+        </div>
+      </Dialog.Content>
+    </Dialog.Portal>
+  </Dialog.Root>
+);
+
+// ─────────────────────────────────────────────────────────────
 //  PAGE ROOT
 // ─────────────────────────────────────────────────────────────
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState('Home');
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
+  const [resumeOpen, setResumeOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined') return 'light';
     try {
       const stored = window.localStorage.getItem('portfolio_theme');
-      if (stored === 'light' || stored === 'dark') {
-        setTheme(stored);
-      }
+      return stored === 'dark' ? 'dark' : 'light';
     } catch {
-      // Ignore storage errors.
+      return 'light';
     }
-  }, []);
+  });
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -1803,11 +2048,13 @@ export default function Home() {
         scrollToSection={scrollToSection}
         theme={theme}
         onToggleTheme={toggleTheme}
+        onOpenResume={() => setResumeOpen(true)}
       />
 
-      <HeroSection />
-      <AboutSection />
+      <HeroSection onOpenResume={() => setResumeOpen(true)} />
+      <AboutSection onOpenResume={() => setResumeOpen(true)} />
       <ProjectsSection />
+      <PublicationsSection />
       <SkillsSection />
       <ExperienceSection />
       <CertificationsSection />
@@ -1815,6 +2062,8 @@ export default function Home() {
       <Footer />
 
       <BackToTop />
+
+      <ResumeViewerModal open={resumeOpen} onOpenChange={setResumeOpen} />
     </div>
   );
 }
