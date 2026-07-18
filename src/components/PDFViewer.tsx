@@ -111,7 +111,13 @@ export default function PDFViewer({ url, name, onDelete }: { url: string; name?:
         ) : ReactPDF ? (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <ReactPDF.Document file={url} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadError} loading={null}>
-              <ReactPDF.Page pageNumber={pageNumber} scale={scale} loading={null} />
+              <ReactPDF.Page
+                pageNumber={pageNumber}
+                scale={scale}
+                loading={null}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+              />
             </ReactPDF.Document>
           </div>
         ) : (
