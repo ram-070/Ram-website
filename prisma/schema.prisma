@@ -7,45 +7,30 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model Note {
-  id         String    @id @default(cuid())
-  title      String
-  content    String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  dateTime   DateTime?
-  pinned     Boolean   @default(false)
-  favorite   Boolean   @default(false)
-  tags       Tag[]     @relation("NoteTags")
-  attachments Attachment[]
+model Notebook {
+  id        String    @id @default(cuid())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  sections  Section[]
 }
 
-model BlogPost {
-  id         String    @id @default(cuid())
-  slug       String    @unique
-  title      String
-  content    String
-  coverImage String?
-  author     String?
-  published  Boolean   @default(false)
-  publishedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  tags       Tag[]     @relation("BlogTags")
+model Section {
+  id         String   @id @default(cuid())
+  name       String
+  notebookId String
+  notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  pages      Page[]
 }
 
-model Tag {
-  id    String @id @default(cuid())
-  name  String @unique
-  notes Note[] @relation("NoteTags")
-  blogs BlogPost[] @relation("BlogTags")
-}
-
-model Attachment {
-  id        String   @id @default(cuid())
-  filename  String
-  mime      String
-  url       String
-  note      Note?    @relation(fields: [noteId], references: [id])
-  noteId    String?
+model Page {
+  id          String   @id @default(cuid())
+  title       String   @default("Untitled page")
+  contentHtml String   @default("")
+  sectionId   String
+  section     Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

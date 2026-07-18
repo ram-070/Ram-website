@@ -1,5 +1,5 @@
-import NotesWorkspace from './NotesWorkspace';
+import OneNoteWorkspace from './OneNoteWorkspace';
 
 export default function NotesPage() {
-  return <NotesWorkspace />;
+  return <OneNoteWorkspace />;
 }

@@ -1,0 +1,396 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg-base);
+  color: var(--text-1);
+  display: flex;
+}
+
+.mobileMenuButton {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 40;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  border-radius: 0.6rem;
+  padding: 0.5rem;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  border: none;
+  z-index: 25;
+}
+
+/* Sidebar */
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  padding: 1.1rem 0.8rem;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.4rem 0.8rem;
+  color: var(--accent);
+}
+
+.sidebarTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-1);
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  margin-bottom: 0.8rem;
+}
+
+.searchBox input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.85rem;
+  color: var(--text-1);
+}
+
+.tree {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.emptyTreeState {
+  color: var(--text-4);
+  font-size: 0.85rem;
+  padding: 1rem 0.6rem;
+}
+
+.notebookGroup {
+  margin-bottom: 0.2rem;
+}
+
+.treeRow {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  border-radius: 0.5rem;
+}
+
+.treeRow:hover {
+  background: var(--bg-elevated);
+}
+
+.treeRowMain {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.85rem;
+  padding: 0.42rem 0.35rem;
+  text-align: left;
+  min-width: 0;
+}
+
+.treeLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sectionRow {
+  margin-left: 0.9rem;
+}
+
+.pageRow {
+  margin-left: 1.7rem;
+}
+
+.pageRowActive {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sectionDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  flex-shrink: 0;
+}
+
+.treeIconButton {
+  border: none;
+  background: transparent;
+  color: var(--text-4);
+  padding: 0.3rem;
+  border-radius: 0.4rem;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  flex-shrink: 0;
+}
+
+.treeRow:hover .treeIconButton,
+.treeMenuWrap:has(.treeMenu) .treeIconButton {
+  opacity: 1;
+}
+
+.treeIconButton:hover {
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--text-1);
+}
+
+.treeMenuWrap {
+  position: relative;
+}
+
+.treeMenu {
+  position: absolute;
+  right: 0;
+  top: 1.9rem;
+  z-index: 30;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  min-width: 8rem;
+  overflow: hidden;
+}
+
+.treeMenu button {
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+
+.treeMenu button:hover {
+  background: var(--bg-elevated);
+}
+
+.treeMenuDanger {
+  color: #dc2626 !important;
+}
+
+.newNotebookButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  border: 1px dashed var(--border);
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 0.85rem;
+  padding: 0.55rem;
+  margin-top: 0.6rem;
+}
+
+.newNotebookButton:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.searchResults {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.searchResultItem {
+  border: none;
+  background: transparent;
+  text-align: left;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.6rem;
+}
+
+.searchResultItem:hover {
+  background: var(--bg-elevated);
+}
+
+.searchResultTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.searchResultPath {
+  font-size: 0.72rem;
+  color: var(--text-4);
+  margin-top: 0.1rem;
+}
+
+/* Editor panel */
+
+.editorPanel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.editorShell {
+  width: min(46rem, 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.breadcrumb {
+  font-size: 0.78rem;
+  color: var(--text-4);
+}
+
+.saveStatus {
+  font-size: 0.78rem;
+  color: var(--text-4);
+}
+
+.titleInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-1);
+  padding: 0.4rem 0 0.6rem;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.4rem 0;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.toolButton {
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  padding: 0.4rem;
+  border-radius: 0.5rem;
+}
+
+.toolButton:hover {
+  background: var(--bg-elevated);
+  color: var(--text-1);
+}
+
+.headingSelect {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 0.8rem;
+  padding: 0.3rem 0.5rem;
+  margin: 0 0.3rem;
+}
+
+.editorScroll {
+  flex: 1;
+}
+
+.editorContent {
+  min-height: 60vh;
+  outline: none;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--text-1);
+}
+
+.editorContent p {
+  margin: 0.4em 0;
+}
+
+.editorContent mark {
+  background: #fde68a;
+  border-radius: 0.15em;
+  padding: 0 0.1em;
+}
+
+.editorContent ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.editorContent ul[data-type='taskList'] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.emptyPageState {
+  margin: auto;
+  text-align: center;
+  color: var(--text-4);
+}
+
+.emptyPageState h2 {
+  color: var(--text-2);
+  font-size: 1.1rem;
+  margin: 0.8rem 0 0.3rem;
+}
+
+@media (max-width: 860px) {
+  .mobileMenuButton {
+    display: inline-flex;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 30;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .editorPanel {
+    padding-top: 4rem;
+  }
+}
