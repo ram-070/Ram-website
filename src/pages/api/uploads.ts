@@ -1,5 +1,3 @@
-
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IncomingForm, File as FormidableFile } from 'formidable';
 import fs from 'fs';
@@ -10,7 +8,6 @@ export const config = {
     bodyParser: false,
   },
 };
-
 
 const uploadDir = path.join(process.cwd(), 'public', 'uploads');
 fs.mkdirSync(uploadDir, { recursive: true });
