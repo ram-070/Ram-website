@@ -20,6 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (err) return res.status(500).json({ error: String(err) });
       const fileArray: { url: string; filename: string; mime: string }[] = [];
       const entries: FormidableFile[] = Array.isArray(files.file) ? files.file : files.file ? [files.file] : [];
+      
       for (const f of entries) {
         if (!f) continue;
         const fname = path.basename(f.filepath || 'file');

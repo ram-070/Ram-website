@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 
 export default function PDFViewer({ url, name, onDelete }: { url: string; name?: string; onDelete?: () => void }) {
   const [scale, setScale] = useState(1.0);
-  const [pageNumber, setPageNumber] = useState(1);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +12,6 @@ export default function PDFViewer({ url, name, onDelete }: { url: string; name?:
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setPageNumber(1);
     setScale(1.0);
     setNumPages(null);
     setLoading(true);
@@ -45,9 +43,6 @@ export default function PDFViewer({ url, name, onDelete }: { url: string; name?:
     setError(String(err));
     setLoading(false);
   }
-
-  const prevPage = () => setPageNumber((p) => Math.max(1, p - 1));
-  const nextPage = () => setPageNumber((p) => Math.min((numPages ?? p), p + 1));
 
   const zoomIn = () => setScale((s) => Math.min(3, +(s + 0.25).toFixed(2)));
   const zoomOut = () => setScale((s) => Math.max(0.5, +(s - 0.25).toFixed(2)));
@@ -89,9 +84,7 @@ export default function PDFViewer({ url, name, onDelete }: { url: string; name?:
           <button className="px-2 py-1 text-sm" onClick={zoomOut} aria-label="Zoom out">-</button>
           <div className="text-sm">{Math.round(scale * 100)}%</div>
           <button className="px-2 py-1 text-sm" onClick={zoomIn} aria-label="Zoom in">+</button>
-          <button className="px-2 py-1 text-sm" onClick={prevPage} aria-label="Previous page">Prev</button>
-          <div className="text-sm">{pageNumber}{numPages ? ` / ${numPages}` : ''}</div>
-          <button className="px-2 py-1 text-sm" onClick={nextPage} aria-label="Next page">Next</button>
+          {numPages ? <div className="text-sm text-gray-500">{numPages} page{numPages > 1 ? 's' : ''}</div> : null}
           <button className="px-2 py-1 text-sm" onClick={toggleFullscreen} aria-label="Toggle fullscreen">Fullscreen</button>
           <button className="px-2 py-1 text-sm" onClick={openNewTab} aria-label="Open in new tab">Open</button>
           <button className="px-2 py-1 text-sm" onClick={download} aria-label="Download">Download</button>
@@ -109,15 +102,20 @@ export default function PDFViewer({ url, name, onDelete }: { url: string; name?:
         {error ? (
           <div className="p-4 text-sm text-red-600">Failed to load PDF: {error}</div>
         ) : ReactPDF ? (
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
             <ReactPDF.Document file={url} onLoadSuccess={onDocumentLoadSuccess} onLoadError={onDocumentLoadError} loading={null}>
-              <ReactPDF.Page
-                pageNumber={pageNumber}
-                scale={scale}
-                loading={null}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-              />
+              {numPages
+                ? Array.from({ length: numPages }, (_, i) => i + 1).map((pageNumber) => (
+                    <ReactPDF.Page
+                      key={pageNumber}
+                      pageNumber={pageNumber}
+                      scale={scale}
+                      loading={null}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                    />
+                  ))
+                : null}
             </ReactPDF.Document>
           </div>
         ) : (

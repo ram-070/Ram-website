@@ -7,6 +7,7 @@ import Highlight from '@tiptap/extension-highlight';
 import Placeholder from '@tiptap/extension-placeholder';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
+import Image from '@tiptap/extension-image';
 import {
   Bold,
   Book,
@@ -15,6 +16,7 @@ import {
   ChevronRight,
   FileText,
   Highlighter,
+  ImageIcon,
   Italic,
   List,
   ListOrdered,
@@ -75,15 +77,11 @@ async function api<T>(url: string, init?: RequestInit): Promise<T> {
   return res.json();
 }
 
-function formatRelative(value: string) {
-  const diffMs = Date.now() - new Date(value).getTime();
-  const diffMinutes = Math.max(0, Math.round(diffMs / 60000));
-  if (diffMinutes < 1) return 'just now';
-  if (diffMinutes < 60) return `${diffMinutes}m ago`;
-  const diffHours = Math.round(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours}h ago`;
-  const diffDays = Math.round(diffHours / 24);
-  return `${diffDays}d ago`;
+function formatDateline(value: string) {
+  const date = new Date(value);
+  const datePart = date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const timePart = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  return `${datePart}   ${timePart}`;
 }
 
 function findLocation(notebooks: NotebookData[], pageId: string) {
@@ -156,6 +154,9 @@ export default function OneNoteWorkspace() {
     api<PageDetail>(`/api/pages/${selectedPageId}`).then(setCurrentPage);
   }, [selectedPageId]);
 
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
@@ -163,6 +164,7 @@ export default function OneNoteWorkspace() {
       TaskList,
       TaskItem.configure({ nested: true }),
       Placeholder.configure({ placeholder: 'Start writing…' }),
+      Image.configure({ inline: false, allowBase64: false }),
     ],
     content: currentPage?.contentHtml ?? EMPTY_HTML,
     immediatelyRender: true,
@@ -180,6 +182,45 @@ export default function OneNoteWorkspace() {
     if (html !== next) editor.commands.setContent(next, { emitUpdate: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage?.id, editor]);
+
+  const uploadImage = useCallback(
+    async (file: File) => {
+      const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      if (!allowed.includes(file.type)) {
+        alert('Only JPG, PNG, WEBP, and GIF images are supported.');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert('Image must be under 10 MB.');
+        return;
+      }
+      setImageUploading(true);
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch('/api/uploads', { method: 'POST', body: fd });
+        if (!res.ok) throw new Error('Upload failed');
+        const data: { files: { url: string }[] } = await res.json();
+        const url = data.files[0]?.url;
+        if (url && editor) editor.chain().focus().setImage({ src: url, alt: file.name }).run();
+      } catch {
+        alert('Image upload failed. Please try again.');
+      } finally {
+        setImageUploading(false);
+      }
+    },
+    [editor],
+  );
+
+  const handleImageDrop = useCallback(
+    (event: React.DragEvent) => {
+      const files = Array.from(event.dataTransfer.files).filter((f) => f.type.startsWith('image/'));
+      if (!files.length) return;
+      event.preventDefault();
+      files.forEach(uploadImage);
+    },
+    [uploadImage],
+  );
 
   const queueSave = useCallback(
     (patch: { title?: string; contentHtml?: string }) => {
@@ -360,6 +401,16 @@ export default function OneNoteWorkspace() {
     return findLocation(notebooks, currentPage.id);
   }, [currentPage, notebooks]);
 
+  // The notebook/section the "Add section" / "Add page" toolbar buttons act on —
+  // whichever the current page belongs to, falling back to the first expanded one.
+  const currentNotebookId =
+    breadcrumb?.notebook.id ?? notebooks.find((nb) => expandedNotebooks.has(nb.id))?.id ?? notebooks[0]?.id;
+  const currentSectionId =
+    breadcrumb?.section.id ??
+    notebooks
+      .flatMap((nb) => nb.sections)
+      .find((section) => expandedSections.has(section.id))?.id;
+
   return (
     <div className={styles.page}>
       <button className={styles.mobileMenuButton} onClick={() => setSidebarOpen(true)} aria-label="Open notebooks">
@@ -371,7 +422,26 @@ export default function OneNoteWorkspace() {
       <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.sidebarHeader}>
           <Book size={16} />
-          <h1 className={styles.sidebarTitle}>Notebooks</h1>
+          <h1 className={styles.sidebarTitle}>Ram — Notes</h1>
+        </div>
+
+        <div className={styles.sidebarActions}>
+          <button
+            type="button"
+            className={styles.sidebarActionButton}
+            onClick={() => createSection(currentNotebookId ?? notebooks[0]?.id)}
+            disabled={!currentNotebookId && !notebooks[0]}
+          >
+            <Plus size={14} /> Add section
+          </button>
+          <button
+            type="button"
+            className={styles.sidebarActionButton}
+            onClick={() => createPage(currentSectionId ?? '')}
+            disabled={!currentSectionId}
+          >
+            <Plus size={14} /> Add page
+          </button>
         </div>
 
         <label className={styles.searchBox}>
@@ -467,9 +537,7 @@ export default function OneNoteWorkspace() {
                   {breadcrumb.notebook.name} / {breadcrumb.section.name}
                 </div>
               ) : null}
-              <span className={styles.saveStatus}>
-                {saveState === 'saving' ? 'Saving…' : `Saved · ${formatRelative(currentPage.updatedAt)}`}
-              </span>
+              <span className={styles.saveStatus}>{saveState === 'saving' ? 'Saving…' : 'Saved'}</span>
             </div>
 
             <input
@@ -478,6 +546,7 @@ export default function OneNoteWorkspace() {
               onChange={(event) => onTitleChange(event.target.value)}
               placeholder="Untitled page"
             />
+            <div className={styles.dateline}>{formatDateline(currentPage.updatedAt)}</div>
 
             <div className={styles.toolbar}>
               <button className={styles.toolButton} onClick={() => editor?.chain().focus().toggleBold().run()} aria-label="Bold" title="Bold">
@@ -522,9 +591,34 @@ export default function OneNoteWorkspace() {
               <button className={styles.toolButton} onClick={() => editor?.chain().focus().redo().run()} aria-label="Redo" title="Redo">
                 <Redo2 size={14} />
               </button>
+              <div className={styles.toolbarDivider} />
+              <button
+                className={`${styles.toolButton} ${imageUploading ? styles.toolButtonDisabled : ''}`}
+                onClick={() => imageInputRef.current?.click()}
+                aria-label="Insert image"
+                title="Insert image (JPG, PNG, WEBP, GIF — max 10 MB)"
+                disabled={imageUploading}
+              >
+                {imageUploading ? <span className={styles.toolSpinner} /> : <ImageIcon size={14} />}
+              </button>
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                multiple
+                className={styles.hiddenInput}
+                onChange={(e) => {
+                  Array.from(e.target.files ?? []).forEach(uploadImage);
+                  e.target.value = '';
+                }}
+              />
             </div>
 
-            <div className={styles.editorScroll}>
+            <div
+              className={styles.editorScroll}
+              onDrop={handleImageDrop}
+              onDragOver={(e) => e.preventDefault()}
+            >
               <EditorContent editor={editor} />
             </div>
           </div>

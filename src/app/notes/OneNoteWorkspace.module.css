@@ -50,10 +50,43 @@
 }
 
 .sidebarTitle {
-  font-size: 0.95rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
   font-weight: 700;
   margin: 0;
   color: var(--text-1);
+}
+
+.sidebarActions {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0 0.2rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.9rem;
+}
+
+.sidebarActionButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.sidebarActionButton:hover:not(:disabled) {
+  background: var(--bg-elevated);
+}
+
+.sidebarActionButton:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .searchBox {
@@ -287,10 +320,18 @@
   outline: none;
   background: transparent;
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   font-weight: 700;
   color: var(--text-1);
-  padding: 0.4rem 0 0.6rem;
+  padding: 0.4rem 0 0.2rem;
+}
+
+.dateline {
+  font-size: 0.82rem;
+  color: var(--text-4);
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.1rem;
 }
 
 .toolbar {
@@ -314,6 +355,37 @@
 .toolButton:hover {
   background: var(--bg-elevated);
   color: var(--text-1);
+}
+
+.toolButtonDisabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.toolbarDivider {
+  width: 1px;
+  height: 1.25rem;
+  background: var(--border);
+  margin: 0 0.2rem;
+  flex-shrink: 0;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.toolSpinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
 
 .headingSelect {
@@ -357,6 +429,20 @@
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
+}
+
+.editorContent img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  display: block;
+  margin: 0.75em 0;
+}
+
+.editorContent img.ProseMirror-selectednode {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .emptyPageState {

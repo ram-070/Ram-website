@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 
-import profile from '@/content/profile.json';
+import { profile } from '@/content/site';
 
 export async function POST(request: Request) {
   try {
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
           await fs.writeFile(filepath, JSON.stringify(payload, null, 2), 'utf8');
           // Return success so the UI shows the message as sent during development
           return NextResponse.json({ ok: true, savedTo: filepath });
-        } catch (err) {
+        } catch {
           return NextResponse.json({ error: 'Failed to save message to outbox.' }, { status: 500 });
         }
       }
