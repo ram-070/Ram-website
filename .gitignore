@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# dev server logs
+*.log
+dev.log
+
+# runtime file uploads (user-generated at runtime, not site source)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# ad-hoc screenshots/reference images dropped in the repo root during work
+/Pasted image*.png
+/Screenshot*.png
