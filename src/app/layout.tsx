@@ -1,15 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { Schibsted_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-// ── Fonts ──────────────────────────────────────────────────────────────────────
-// Space Grotesk: geometric display — used for headings/brand
-// Inter: clean, humanist body — readable at any size
-// JetBrains Mono: monospace for code/labels
-const spaceGrotesk = Space_Grotesk({
+// Schibsted Grotesk: display face for headings and the wordmark
+// Inter: body copy
+// JetBrains Mono: eyebrows, durations, tags
+const schibsted = Schibsted_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-space-grotesk",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-schibsted",
   display: "swap",
 });
 
@@ -27,27 +26,26 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-// ── Metadata ───────────────────────────────────────────────────────────────────
 export const metadata: Metadata = {
   title: {
-    default: "Ram Dular Yadav · ML Engineer",
-    template: "%s · Ram Dular Yadav",
+    default: "Ram · Machine Learning Engineer",
+    template: "%s · Ram",
   },
   description:
     "Machine Learning Engineer specialising in LLMs, NLP pipelines, computer vision, and RAG systems. GCP Certified. Based in Kathmandu, Nepal.",
   keywords: [
     "Machine Learning Engineer",
+    "AI Engineer",
+    "Data Scientist",
     "Deep Learning",
     "NLP",
     "Computer Vision",
     "RAG Systems",
     "LLMs",
-    "LangChain",
     "Python",
     "TensorFlow",
     "PyTorch",
     "GCP Certified",
-    "AI Engineer Nepal",
   ],
   authors: [{ name: "Ram Dular Yadav", url: "https://ram-portfolio.com" }],
   creator: "Ram Dular Yadav",
@@ -57,25 +55,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://ram-portfolio.com",
-    title: "Ram Dular Yadav · Machine Learning Engineer",
+    title: "Ram · Machine Learning Engineer",
     description:
-      "Building intelligent AI systems that ship to production. GCP Certified · Deep Learning · NLP · Computer Vision · RAG.",
-    siteName: "Ram's Portfolio",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Ram Dular Yadav — Machine Learning Engineer",
-      },
-    ],
+      "Machine learning that ships to production. LLMs · NLP · Computer Vision · Forecasting. GCP Certified.",
+    siteName: "Ram",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Ram Dular Yadav · Machine Learning Engineer",
+    card: "summary",
+    title: "Ram · Machine Learning Engineer",
     description:
-      "Building intelligent AI systems that ship to production. GCP Certified · Deep Learning · NLP · Computer Vision · RAG.",
-    images: ["/og-image.png"],
+      "Machine learning that ships to production. LLMs · NLP · Computer Vision · Forecasting. GCP Certified.",
   },
   robots: {
     index: true,
@@ -83,41 +72,26 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
-    apple: "/apple-touch-icon.png",
+    icon: [{ url: "/favicon.ico", sizes: "any" }],
   },
-  manifest: "/site.webmanifest",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b6ef6",
+  themeColor: "#F6F6F3",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
 };
 
-// ── Layout ─────────────────────────────────────────────────────────────────────
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
-      className={`
-        ${spaceGrotesk.variable}
-        ${inter.variable}
-        ${jetbrainsMono.variable}
-        h-full antialiased scroll-smooth
-      `}
+      className={`${schibsted.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <head>
-        {/* Preconnect to font CDNs for faster load */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
         {/* Structured data — Person schema */}
         <script
           type="application/ld+json"
@@ -150,9 +124,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body className="min-h-full flex flex-col bg-[var(--bg-base)] text-[var(--text-1)] selection:bg-[var(--accent-subtle)] selection:text-[var(--accent)]">
-        {children}
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
