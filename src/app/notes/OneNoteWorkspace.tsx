@@ -8,6 +8,8 @@ import Placeholder from '@tiptap/extension-placeholder';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import Image from '@tiptap/extension-image';
+import { Table, TableRow, TableHeader, TableCell } from '@tiptap/extension-table';
+import { marked } from 'marked';
 import {
   Bold,
   Book,
@@ -83,6 +85,10 @@ function formatDateline(value: string) {
   const timePart = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
   return `${datePart}   ${timePart}`;
 }
+
+const MARKDOWN_PATTERN =
+  /(^|\n)\s{0,3}#{1,6}\s+\S|(^|\n)\s{0,3}[-*+]\s+\S|(^|\n)\s{0,3}\d+\.\s+\S|\*\*[^*\n]+\*\*|__[^_\n]+__|(^|\n)\s{0,3}\|.+\|\s*(\n|$)/;
+const RICH_HTML_PATTERN = /<(table|strong|b|em|i|ul|ol|li|h[1-6]|code|pre)\b/i;
 
 function findLocation(notebooks: NotebookData[], pageId: string) {
   for (const notebook of notebooks) {
@@ -165,10 +171,29 @@ export default function OneNoteWorkspace() {
       TaskItem.configure({ nested: true }),
       Placeholder.configure({ placeholder: 'Start writing…' }),
       Image.configure({ inline: false, allowBase64: false }),
+      Table.configure({ resizable: false }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: currentPage?.contentHtml ?? EMPTY_HTML,
     immediatelyRender: true,
-    editorProps: { attributes: { class: styles.editorContent } },
+    editorProps: {
+      attributes: { class: styles.editorContent },
+      handlePaste: (_view, event) => {
+        const clipboardData = event.clipboardData;
+        const text = clipboardData?.getData('text/plain');
+        if (!text || !MARKDOWN_PATTERN.test(text)) return false;
+
+        const html = clipboardData?.getData('text/html');
+        if (html && RICH_HTML_PATTERN.test(html)) return false;
+
+        const parsedHtml = marked.parse(text, { async: false }) as string;
+        editor?.chain().focus().insertContent(parsedHtml, { parseOptions: { preserveWhitespace: false } }).run();
+        event.preventDefault();
+        return true;
+      },
+    },
     onUpdate: ({ editor: instance }) => {
       if (!currentPage) return;
       queueSave({ contentHtml: instance.getHTML() });

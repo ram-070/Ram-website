@@ -289,11 +289,11 @@
   min-width: 0;
   display: flex;
   justify-content: center;
-  padding: 2rem 1.5rem 3rem;
+  padding: 2rem 1rem 3rem;
 }
 
 .editorShell {
-  width: min(46rem, 100%);
+  width: min(60rem, 100%);
   display: flex;
   flex-direction: column;
 }
@@ -420,6 +420,34 @@
   padding: 0 0.1em;
 }
 
+.editorContent ol,
+.editorContent ul:not([data-type='taskList']) {
+  margin: 0.5em 0;
+  padding-left: 1.6rem;
+}
+
+.editorContent ol {
+  list-style: decimal outside;
+}
+
+.editorContent ul:not([data-type='taskList']) {
+  list-style: disc outside;
+}
+
+.editorContent li {
+  margin: 0.3em 0;
+  padding-left: 0.2rem;
+}
+
+.editorContent li > p {
+  margin: 0;
+}
+
+.editorContent li > ol,
+.editorContent li > ul:not([data-type='taskList']) {
+  margin: 0.3em 0;
+}
+
 .editorContent ul[data-type='taskList'] {
   list-style: none;
   padding-left: 0;
@@ -431,13 +459,44 @@
   gap: 0.5rem;
 }
 
+.editorContent .tableWrapper {
+  overflow-x: auto;
+  margin: 0.8em 0;
+}
+
+.editorContent table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.editorContent th,
+.editorContent td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.editorContent th {
+  background: var(--bg-elevated);
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.editorContent td > p,
+.editorContent th > p {
+  margin: 0;
+}
+
 .editorContent img {
-  max-width: 100%;
+  width: 100%;
+  max-width: min(45rem, 100%);
   height: auto;
   border-radius: 0.75rem;
   border: 1px solid var(--border);
   display: block;
-  margin: 0.75em 0;
+  margin: 0.75em auto;
 }
 
 .editorContent img.ProseMirror-selectednode {
