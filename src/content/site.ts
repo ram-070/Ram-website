@@ -6,7 +6,7 @@ export const profile = {
   greeting: 'Hi, I’m Ram',
   title: 'Machine Learning Engineer',
   tagline: 'GCP Certified',
-  bio: 'I build intelligent AI systems that go from research to production. Currently at Fusemachines, I specialise in LLMs, NLP pipelines, computer vision, and time-series forecasting. I care deeply about clean architectures, reproducible experiments, and AI that actually ships.',
+  bio: 'I’m a Machine Learning Engineer who enjoys solving difficult problems with data, models, and thoughtful engineering.',
   status: 'Available for opportunities',
   location: 'Kathmandu, Nepal',
   email: 'rammey115@gmail.com',
@@ -18,9 +18,10 @@ export const profile = {
 export const about = {
   image: '/portrait.jpg',
   paragraphs: [
-    'I’m a Machine Learning Engineer based in Kathmandu, Nepal. My journey into AI started with a deep fascination for how machines can understand language and visual context — and I’ve been building in that space ever since.',
-    'Currently at Fusemachines, I work on production AI systems: sentiment analysis pipelines, demand forecasting models, and LLM-powered agents. I’ve also completed the Fusemachines AI Fellowship, where I built end-to-end AI applications spanning computer vision, NLP, and generative AI.',
-    'I’m a Google Cloud Certified Professional ML Engineer, and I believe strongly in clean code, reproducible experiments, and AI that genuinely ships to users.',
+    'I’m a Machine Learning Engineer who enjoys turning complex problems into practical solutions with data and AI.',
+    'My work spans applied machine learning, predictive modeling, graph ML, and fraud detection. I enjoy working across the entire journey: understanding the problem, exploring the data, building and evaluating models, and turning them into systems that can be used in the real world.',
+    'I’m especially interested in problems where the answer isn’t obvious: finding hidden patterns in data, understanding relationships between entities, and building models that can make better decisions at scale.',
+    'Beyond the models themselves, I care about **good engineering**, **continuous learning**, and building things that are **genuinely useful**.',
   ],
 };
 

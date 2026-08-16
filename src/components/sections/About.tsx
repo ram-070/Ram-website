@@ -4,6 +4,18 @@ import Image from 'next/image';
 import { Section, Reveal } from '@/components/ui';
 import { about, education } from '@/content/site';
 
+function renderWithEmphasis(text: string) {
+  return text.split(/\*\*(.+?)\*\*/g).map((part, i) =>
+    i % 2 === 1 ? (
+      <strong key={i} style={{ color: 'var(--text-1)', fontWeight: 700 }}>
+        {part}
+      </strong>
+    ) : (
+      part
+    ),
+  );
+}
+
 export default function About() {
   return (
     <Section id="about" eyebrow="About" title="About me">
@@ -51,7 +63,7 @@ export default function About() {
 
             {about.paragraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 32)} className="text-[1.02rem] leading-[1.85]">
-                {paragraph}
+                {renderWithEmphasis(paragraph)}
               </p>
             ))}
           </div>
