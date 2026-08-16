@@ -8,7 +8,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const pages = await prisma.page.findMany({
       where: {
-        OR: [{ title: { contains: String(q) } }, { contentHtml: { contains: String(q) } }],
+        OR: [
+          { title: { contains: String(q) } },
+          { contentHtml: { contains: String(q) } },
+          { canvasData: { contains: String(q) } },
+        ],
       },
       orderBy: { updatedAt: 'desc' },
       select: {

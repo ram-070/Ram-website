@@ -27,11 +27,13 @@ import {
   Plus,
   Redo2,
   Search,
+  StickyNote,
   Trash2,
   Underline as UnderlineIcon,
   Undo2,
 } from 'lucide-react';
 import styles from './OneNoteWorkspace.module.css';
+import TextBoxCanvas, { countTotalWords, TextBoxCanvasHandle } from './TextBoxCanvas';
 
 interface PageSummary {
   id: string;
@@ -56,6 +58,7 @@ interface PageDetail {
   id: string;
   title: string;
   contentHtml: string;
+  canvasData: string;
   sectionId: string;
   updatedAt: string;
 }
@@ -111,6 +114,7 @@ export default function OneNoteWorkspace() {
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const searchTimeout = useRef<number | null>(null);
   const saveTimeout = useRef<number | null>(null);
 
@@ -162,6 +166,8 @@ export default function OneNoteWorkspace() {
 
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const [imageUploading, setImageUploading] = useState(false);
+  const textBoxLayerRef = useRef<TextBoxCanvasHandle | null>(null);
+  const insertTextBox = useCallback(() => textBoxLayerRef.current?.addBox(), []);
 
   const editor = useEditor({
     extensions: [
@@ -248,7 +254,7 @@ export default function OneNoteWorkspace() {
   );
 
   const queueSave = useCallback(
-    (patch: { title?: string; contentHtml?: string }) => {
+    (patch: { title?: string; contentHtml?: string; canvasData?: string }) => {
       if (!currentPage) return;
       const pageId = currentPage.id;
       setCurrentPage((prev) => (prev ? { ...prev, ...patch } : prev));
@@ -286,6 +292,13 @@ export default function OneNoteWorkspace() {
   const onTitleChange = useCallback(
     (value: string) => {
       queueSave({ title: value });
+    },
+    [queueSave],
+  );
+
+  const onCanvasChange = useCallback(
+    (json: string) => {
+      queueSave({ canvasData: json });
     },
     [queueSave],
   );
@@ -426,6 +439,8 @@ export default function OneNoteWorkspace() {
     return findLocation(notebooks, currentPage.id);
   }, [currentPage, notebooks]);
 
+  const canvasWordCount = useMemo(() => countTotalWords(currentPage?.canvasData ?? '[]'), [currentPage?.canvasData]);
+
   // The notebook/section the "Add section" / "Add page" toolbar buttons act on —
   // whichever the current page belongs to, falling back to the first expanded one.
   const currentNotebookId =
@@ -444,11 +459,29 @@ export default function OneNoteWorkspace() {
 
       {sidebarOpen ? <button className={styles.backdrop} aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} /> : null}
 
-      <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
-        <div className={styles.sidebarHeader}>
+      {sidebarCollapsed ? (
+        <button
+          type="button"
+          className={styles.expandSidebarButton}
+          onClick={() => setSidebarCollapsed(false)}
+          aria-label="Show notebooks"
+          title="Show notebooks"
+        >
+          <Book size={16} />
+        </button>
+      ) : null}
+
+      <aside className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''} ${sidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
+        <button
+          type="button"
+          className={styles.sidebarHeader}
+          onClick={() => setSidebarCollapsed(true)}
+          aria-label="Hide notebooks"
+          title="Hide notebooks"
+        >
           <Book size={16} />
           <h1 className={styles.sidebarTitle}>Ram — Notes</h1>
-        </div>
+        </button>
 
         <div className={styles.sidebarActions}>
           <button
@@ -637,6 +670,13 @@ export default function OneNoteWorkspace() {
                   e.target.value = '';
                 }}
               />
+              <button className={styles.toolButton} onClick={insertTextBox} aria-label="Insert text box" title="Insert draggable text box">
+                <StickyNote size={14} />
+              </button>
+              <div className={styles.toolbarDivider} />
+              <span className={styles.wordCountBadge}>
+                Word Count: <strong>{canvasWordCount}</strong>
+              </span>
             </div>
 
             <div
@@ -645,6 +685,12 @@ export default function OneNoteWorkspace() {
               onDragOver={(e) => e.preventDefault()}
             >
               <EditorContent editor={editor} />
+              <TextBoxCanvas
+                ref={textBoxLayerRef}
+                key={currentPage.id}
+                initialData={currentPage.canvasData}
+                onChange={onCanvasChange}
+              />
             </div>
           </div>
         ) : (

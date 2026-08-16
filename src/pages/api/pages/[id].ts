@@ -11,10 +11,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'PATCH') {
-    const { title, contentHtml } = req.body ?? {};
+    const { title, contentHtml, canvasData } = req.body ?? {};
     const data: Record<string, unknown> = {};
     if (title !== undefined) data.title = title;
     if (contentHtml !== undefined) data.contentHtml = contentHtml;
+    if (canvasData !== undefined) data.canvasData = canvasData;
 
     try {
       const page = await prisma.page.update({ where: { id: String(id) }, data });

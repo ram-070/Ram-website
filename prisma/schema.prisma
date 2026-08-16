@@ -29,6 +29,7 @@ model Page {
   id          String   @id @default(cuid())
   title       String   @default("Untitled page")
   contentHtml String   @default("")
+  canvasData  String   @default("[]")
   sectionId   String
   section     Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())

@@ -39,6 +39,23 @@
   height: 100vh;
   position: sticky;
   top: 0;
+  transition: width 0.18s ease, padding 0.18s ease;
+}
+
+.expandSidebarButton {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 40;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--accent);
+  border-radius: 0.6rem;
+  padding: 0.5rem;
+}
+
+.expandSidebarButton:hover {
+  background: var(--bg-elevated);
 }
 
 .sidebarHeader {
@@ -46,6 +63,18 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0 0.4rem 0.8rem;
+  color: var(--accent);
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+}
+
+.sidebarHeader:hover {
+  color: var(--accent);
+}
+
+.sidebarHeader:hover .sidebarTitle {
   color: var(--accent);
 }
 
@@ -370,6 +399,18 @@
   flex-shrink: 0;
 }
 
+.wordCountBadge {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.wordCountBadge strong {
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
 .hiddenInput {
   display: none;
 }
@@ -400,6 +441,7 @@
 
 .editorScroll {
   flex: 1;
+  position: relative;
 }
 
 .editorContent {
@@ -516,7 +558,20 @@
   margin: 0.8rem 0 0.3rem;
 }
 
+@media (min-width: 861px) {
+  .sidebarCollapsed {
+    width: 0;
+    padding: 0;
+    border-right: none;
+    overflow: hidden;
+  }
+}
+
 @media (max-width: 860px) {
+  .expandSidebarButton {
+    display: none;
+  }
+
   .mobileMenuButton {
     display: inline-flex;
   }
