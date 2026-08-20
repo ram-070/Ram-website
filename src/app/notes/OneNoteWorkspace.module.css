@@ -453,6 +453,7 @@
 }
 
 .editorContent p {
+  max-width: none;
   margin: 0.4em 0;
 }
 

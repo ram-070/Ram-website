@@ -118,6 +118,16 @@ export default function OneNoteWorkspace() {
   const searchTimeout = useRef<number | null>(null);
   const saveTimeout = useRef<number | null>(null);
 
+  // The portfolio site hides horizontal body overflow globally; Notes needs a real
+  // horizontal scrollbar so text boxes dragged past the viewport edge stay reachable.
+  useEffect(() => {
+    const previous = document.body.style.overflowX;
+    document.body.style.overflowX = 'auto';
+    return () => {
+      document.body.style.overflowX = previous;
+    };
+  }, []);
+
   const refreshNotebooks = useCallback(async () => {
     const data = await api<NotebookData[]>('/api/notebooks');
     setNotebooks(data);

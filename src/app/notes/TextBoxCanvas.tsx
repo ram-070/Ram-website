@@ -1,7 +1,13 @@
 'use client';
 
 import React, { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Highlight from '@tiptap/extension-highlight';
+import Placeholder from '@tiptap/extension-placeholder';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+import { Bold, CheckSquare, Highlighter, Italic, List, Trash2, Underline as UnderlineIcon } from 'lucide-react';
 import styles from './TextBoxCanvas.module.css';
 
 export interface TextBox {
@@ -10,26 +16,39 @@ export interface TextBox {
   y: number;
   width: number;
   height: number;
-  text: string;
+  html: string;
 }
 
 export interface TextBoxCanvasHandle {
   addBox: () => void;
 }
 
-const MIN_WIDTH = 160;
-const MIN_HEIGHT = 100;
-const DEFAULT_WIDTH = 260;
-const DEFAULT_HEIGHT = 150;
+const MIN_WIDTH = 220;
+const MIN_HEIGHT = 140;
+const DEFAULT_WIDTH = 300;
+const DEFAULT_HEIGHT = 190;
+const EMPTY_HTML = '<p></p>';
 
-function countWords(text: string) {
+const boxExtensions = [
+  StarterKit.configure({ heading: false }),
+  Highlight.configure({ multicolor: false }),
+  TaskList,
+  TaskItem.configure({ nested: true }),
+  Placeholder.configure({ placeholder: 'Start writing…' }),
+];
+
+function countWordsInHtml(html: string) {
+  const text = html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&');
   const trimmed = text.trim();
   if (!trimmed) return 0;
   return trimmed.split(/\s+/).length;
 }
 
 export function countTotalWords(json: string) {
-  return parseBoxes(json).reduce((sum, box) => sum + countWords(box.text), 0);
+  return parseBoxes(json).reduce((sum, box) => sum + countWordsInHtml(box.html), 0);
 }
 
 function parseBoxes(json: string): TextBox[] {
@@ -44,7 +63,12 @@ function parseBoxes(json: string): TextBox[] {
         y: Number(b.y) || 0,
         width: Number(b.width) || DEFAULT_WIDTH,
         height: Number(b.height) || DEFAULT_HEIGHT,
-        text: typeof b.text === 'string' ? b.text : '',
+        html:
+          typeof b.html === 'string'
+            ? b.html
+            : typeof b.text === 'string' && b.text
+              ? `<p>${b.text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`
+              : EMPTY_HTML,
       }));
   } catch {
     return [];
@@ -53,6 +77,82 @@ function parseBoxes(json: string): TextBox[] {
 
 function makeId() {
   return `box_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+interface TextBoxItemProps {
+  box: TextBox;
+  zIndex: number;
+  autoFocus: boolean;
+  onDragStart: (event: React.PointerEvent, id: string, mode: 'move' | 'resize') => void;
+  onBringToFront: (id: string) => void;
+  onHtmlChange: (id: string, html: string) => void;
+  onDelete: (id: string) => void;
+}
+
+function TextBoxItem({ box, zIndex, autoFocus, onDragStart, onBringToFront, onHtmlChange, onDelete }: TextBoxItemProps) {
+  const [wordCount, setWordCount] = useState(() => countWordsInHtml(box.html));
+
+  const editor = useEditor({
+    extensions: boxExtensions,
+    content: box.html || EMPTY_HTML,
+    immediatelyRender: true,
+    autofocus: autoFocus ? 'end' : false,
+    editorProps: { attributes: { class: styles.boxEditorContent } },
+    onUpdate: ({ editor: instance }) => {
+      const html = instance.getHTML();
+      onHtmlChange(box.id, html);
+      setWordCount(countWordsInHtml(html));
+    },
+  });
+
+  return (
+    <div
+      className={styles.box}
+      style={{ left: box.x, top: box.y, width: box.width, height: box.height, zIndex }}
+      onPointerDown={() => onBringToFront(box.id)}
+    >
+      <div className={styles.boxHandle} onPointerDown={(e) => onDragStart(e, box.id, 'move')}>
+        <span className={styles.boxWordCount}>{wordCount} words</span>
+        <button
+          type="button"
+          className={styles.deleteButton}
+          aria-label="Delete text box"
+          title="Delete text box"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => onDelete(box.id)}
+        >
+          <Trash2 size={12} />
+        </button>
+      </div>
+
+      <div className={styles.boxToolbar}>
+        <button type="button" className={styles.boxToolButton} onClick={() => editor?.chain().focus().toggleBold().run()} aria-label="Bold" title="Bold">
+          <Bold size={12} />
+        </button>
+        <button type="button" className={styles.boxToolButton} onClick={() => editor?.chain().focus().toggleItalic().run()} aria-label="Italic" title="Italic">
+          <Italic size={12} />
+        </button>
+        <button type="button" className={styles.boxToolButton} onClick={() => editor?.chain().focus().toggleUnderline().run()} aria-label="Underline" title="Underline">
+          <UnderlineIcon size={12} />
+        </button>
+        <button type="button" className={styles.boxToolButton} onClick={() => editor?.chain().focus().toggleHighlight().run()} aria-label="Highlight" title="Highlight">
+          <Highlighter size={12} />
+        </button>
+        <button type="button" className={styles.boxToolButton} onClick={() => editor?.chain().focus().toggleBulletList().run()} aria-label="Bullet list" title="Bullet list">
+          <List size={12} />
+        </button>
+        <button type="button" className={styles.boxToolButton} onClick={() => editor?.chain().focus().toggleTaskList().run()} aria-label="Checklist" title="Checklist">
+          <CheckSquare size={12} />
+        </button>
+      </div>
+
+      <div className={styles.boxEditorScroll} onPointerDown={() => onBringToFront(box.id)}>
+        <EditorContent editor={editor} />
+      </div>
+
+      <div className={styles.resizeHandle} onPointerDown={(e) => onDragStart(e, box.id, 'resize')} />
+    </div>
+  );
 }
 
 interface TextBoxCanvasProps {
@@ -66,8 +166,7 @@ const TextBoxCanvas = forwardRef<TextBoxCanvasHandle, TextBoxCanvasProps>(functi
 ) {
   const [boxes, setBoxes] = useState<TextBox[]>(() => parseBoxes(initialData));
   const [zOrder, setZOrder] = useState<Record<string, number>>({});
-  const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
-  const pendingFocusId = useRef<string | null>(null);
+  const [lastCreatedId, setLastCreatedId] = useState<string | null>(null);
   const topZRef = useRef(1);
   const dragState = useRef<{
     id: string;
@@ -102,11 +201,11 @@ const TextBoxCanvas = forwardRef<TextBoxCanvasHandle, TextBoxCanvasProps>(functi
       y: 32 + cascade,
       width: DEFAULT_WIDTH,
       height: DEFAULT_HEIGHT,
-      text: '',
+      html: EMPTY_HTML,
     };
     commit([...boxes, box]);
     bringToFront(id);
-    pendingFocusId.current = id;
+    setLastCreatedId(id);
   }, [boxes, commit, bringToFront]);
 
   useImperativeHandle(ref, () => ({ addBox }), [addBox]);
@@ -118,9 +217,9 @@ const TextBoxCanvas = forwardRef<TextBoxCanvasHandle, TextBoxCanvasProps>(functi
     [boxes, commit],
   );
 
-  const updateText = useCallback(
-    (id: string, text: string) => {
-      commit(boxes.map((b) => (b.id === id ? { ...b, text } : b)));
+  const updateHtml = useCallback(
+    (id: string, html: string) => {
+      commit(boxes.map((b) => (b.id === id ? { ...b, html } : b)));
     },
     [boxes, commit],
   );
@@ -179,41 +278,16 @@ const TextBoxCanvas = forwardRef<TextBoxCanvasHandle, TextBoxCanvasProps>(functi
   return (
     <div className={styles.layer}>
       {boxes.map((box) => (
-        <div
+        <TextBoxItem
           key={box.id}
-          className={styles.box}
-          style={{ left: box.x, top: box.y, width: box.width, height: box.height, zIndex: zOrder[box.id] ?? 1 }}
-          onPointerDown={() => bringToFront(box.id)}
-        >
-          <div className={styles.boxHandle} onPointerDown={(e) => startDrag(e, box.id, 'move')}>
-            <span className={styles.boxWordCount}>{countWords(box.text)} words</span>
-            <button
-              type="button"
-              className={styles.deleteButton}
-              aria-label="Delete text box"
-              title="Delete text box"
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => deleteBox(box.id)}
-            >
-              <Trash2 size={12} />
-            </button>
-          </div>
-          <textarea
-            ref={(el) => {
-              textareaRefs.current[box.id] = el;
-              if (el && pendingFocusId.current === box.id) {
-                pendingFocusId.current = null;
-                el.focus();
-              }
-            }}
-            className={styles.boxTextarea}
-            value={box.text}
-            placeholder="Start writing…"
-            onChange={(e) => updateText(box.id, e.target.value)}
-            onPointerDown={() => bringToFront(box.id)}
-          />
-          <div className={styles.resizeHandle} onPointerDown={(e) => startDrag(e, box.id, 'resize')} />
-        </div>
+          box={box}
+          zIndex={zOrder[box.id] ?? 1}
+          autoFocus={box.id === lastCreatedId}
+          onDragStart={startDrag}
+          onBringToFront={bringToFront}
+          onHtmlChange={updateHtml}
+          onDelete={deleteBox}
+        />
       ))}
     </div>
   );
