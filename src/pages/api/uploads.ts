@@ -20,6 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       try {
         const fileArray = await Promise.all(
+      
           entries.filter(Boolean).map(async (f) => {
             const buffer = await fs.promises.readFile(f.filepath);
             const blob = await put(f.originalFilename || f.newFilename, buffer, {

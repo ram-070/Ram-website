@@ -90,16 +90,17 @@ export default function Hero({ onOpenResume }: { onOpenResume: () => void }) {
           className="flex justify-center lg:justify-end"
         >
           <div
-            className="relative w-full max-w-[240px] sm:max-w-[280px] lg:max-w-[320px] aspect-square rounded-2xl overflow-hidden"
+            className="relative w-full max-w-[240px] sm:max-w-[280px] lg:max-w-[320px] aspect-square rounded-full overflow-hidden"
             style={{ border: '1px solid var(--border)', background: 'var(--bg-elevated)' }}
           >
             <Image
-              src="/hero.png"
+              src="/photo.jpeg"
               alt="Ram"
               fill
               priority
+              quality={100}
               className="object-cover"
-              style={{ objectPosition: '50% 25%' }}
+              style={{ objectPosition: '50% 50%' }}
               sizes="(max-width: 640px) 240px, (max-width: 1024px) 280px, 320px"
             />
           </div>

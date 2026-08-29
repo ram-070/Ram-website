@@ -46,7 +46,7 @@ const ResumeModal = ({ open, onOpenChange }: { open: boolean; onOpenChange: (ope
           </Dialog.Close>
         </div>
         <div className="flex-1 min-h-0">
-          <PDFViewer url="/Ram-CV.pdf" name="Ram — Resume.pdf" />
+          <PDFViewer url="/Ramdular_Yadav_Resume.pdf" name="Ram — Resume.pdf" />
         </div>
       </Dialog.Content>
     </Dialog.Portal>

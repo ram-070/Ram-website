@@ -3,6 +3,18 @@
 import { Section, Reveal } from '@/components/ui';
 import { experiences, type Experience } from '@/content/site';
 
+function renderWithEmphasis(text: string) {
+  return text.split(/\*\*(.+?)\*\*/g).map((part, i) =>
+    i % 2 === 1 ? (
+      <strong key={i} style={{ color: 'var(--text-1)', fontWeight: 700 }}>
+        {part}
+      </strong>
+    ) : (
+      part
+    ),
+  );
+}
+
 function ExperienceCard({ exp }: { exp: Experience }) {
   return (
     <div>
@@ -16,11 +28,8 @@ function ExperienceCard({ exp }: { exp: Experience }) {
       </p>
       <h3 className="mt-4 text-[1.05rem] font-semibold leading-snug">
         {exp.role}
-        <span style={{ color: 'var(--text-4)', fontWeight: 450 }}> · {exp.company}</span>
+        <span style={{ color: 'var(--text-4)', fontWeight: 450 }}> · {renderWithEmphasis(exp.company)}</span>
       </h3>
-      <p className="mt-3 text-sm font-medium" style={{ color: 'var(--text-2)' }}>
-        {exp.summary}
-      </p>
       <ul className="mt-7 flex flex-col gap-4">
         {exp.highlights.map((highlight) => (
           <li key={highlight} className="text-sm leading-relaxed flex gap-2.5" style={{ color: 'var(--text-3)' }}>
@@ -28,7 +37,7 @@ function ExperienceCard({ exp }: { exp: Experience }) {
               className="mt-[0.62em] inline-block w-1 h-1 rounded-full shrink-0"
               style={{ background: 'var(--border-strong)' }}
             />
-            <span className="min-w-0">{highlight}</span>
+            <span className="min-w-0">{renderWithEmphasis(highlight)}</span>
           </li>
         ))}
       </ul>
